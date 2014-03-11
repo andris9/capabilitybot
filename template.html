@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf8" />
+        <title>IMAP CAPABILITY</title>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+
+            <div class="page-header">
+                <h1>IMAP CAPABILITY</h1>
+                <p class="lead">Information about CAPABILITY info for well known IMAP services.</p>
+            </div>
+
+            <% if(processed){ %>
+
+                <ul>
+                    <% capabilityData.forEach(function(capa, i){ %>
+                        <li><a href="#capa_<%= i %>"><%= capa.host.name %></a></li>
+                    <% }) %>
+                </ul>
+
+                <% capabilityData.forEach(function(capa, i){ %>
+                    <h3 id="capa_<%= i %>"><%= capa.host.name %></h3>
+
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#capa_<%= i %>_capa" data-toggle="tab">Capabilities</a></li>
+                        <li><a href="#capa_<%= i %>conf" data-toggle="tab">Host config</a></li>
+                        <li><a href="#capa_<%= i %>_trans" data-toggle="tab">IMAP transaction</a></li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="capa_<%= i %>_capa">
+
+                            <% if(capa.error){%>
+                                <div class="alert alert-danger">
+                                    <%= capa.error.message %>
+                                </div>
+                            <% } %>
+
+                            <% if(capa.capability){ %>
+                                <table class="table">
+                                <% Object.keys(capa.capability).forEach(function(key){ %>
+
+                                    <tr>
+                                        <th><%= key %></th>
+                                        <td><%= capa.capability[key] %></td>
+                                    </tr>
+
+                                <% }) %>
+                                </table>
+                            <% } %>
+
+                        </div>
+                        <div class="tab-pane" id="capa_<%= i %>conf">
+                            <table class="table">
+
+                                <tr>
+                                    <th>Hostname</th>
+                                    <td><%= capa.host.host %></td>
+                                </tr>
+                                <tr>
+                                    <th>Port</th>
+                                    <td><%= capa.host.port %></td>
+                                </tr>
+                                <tr>
+                                    <th>SSL connection</th>
+                                    <td><%= capa.host.ssl ? "Yes" : "No" %></td>
+                                </tr>
+                                <% if(!capa.host.ssl) {%>
+                                    <tr>
+                                        <th>Use STARTTLS (if available)</th>
+                                        <td><%= capa.host.ignoreSTARTTLS ? "No" : "Yes" %></td>
+                                    </tr>
+                                <%}%>
+
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="capa_<%= i %>_trans">
+                            <% if(capa.transaction){ %>
+                                <table class="table table-condensed">
+                                <% capa.transaction.forEach(function(item){ %>
+
+                                    <tr>
+                                        <th><%= item.type %></th>
+                                        <td><pre style="white-space: pre-wrap;"><%= item.payload %></pre></td>
+                                    </tr>
+
+                                <% }) %>
+                                </table>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+
+            <% } %>
+
+            <% if(!processed){ %>
+                <p>Checking hosts ...</p>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="<%= capabilityData.length %>" aria-valuemin="0" aria-valuemax="<%= total %>" style="width: <%= Math.round(capabilityData.length / total * 100) %>%;">
+                        <span class="sr-only"><%= capabilityData.length %> / <%= total %> Complete</span>
+                    </div>
+                </div>
+
+            <% } %>
+
+            <p>&copy; 2014 Andris Reinman <a href="mailto:andris@kreata.ee">andris@kreata.ee</a></p>
+
+        </div>
+
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    </body>
+</html>

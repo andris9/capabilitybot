@@ -1,0 +1,30 @@
+{
+    "#": "HTTP port where the server is listening",
+    "port": 1337,
+
+    "#": "An array of IMAP host configurations",
+    "hosts": [
+        {
+            "#": "Connection name",
+            "name": "Mail Host",
+
+            "#": "Hostname (defaults to localhost)",
+            "host": "localhost",
+
+            "#": "Port, defaults to 143 for non secure and 993 for secure connections",
+            "port": 143,
+
+            "#": "Start the connection in secure mode if true",
+            "ssl": false,
+
+            "#": "If the connection is not secure, do not use STARTTLS before authentication",
+            "ignoreSTARTTLS": false,
+
+            "#": "Username, if not set then authentication is skipped",
+            "user": "user",
+
+            "#": "Password for the user",
+            "pass": "pass"
+        }
+    ]
+}
