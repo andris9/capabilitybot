@@ -51,11 +51,13 @@ function IMAPChecker(options, callback){
         {
             payload: "A2 STARTTLS",
             ok: function(self){
+                self.log({type:"connection", payload:"Upgrading connection ..."});
                 self.upgradeConnection(function(err){
                     if(err){
                         self.onError(err);
                         return;
                     }
+                    self.log({type:"connection", payload:"Connection upgraded"});
                     self.nextAction();
                 });
             }
@@ -146,11 +148,19 @@ IMAPChecker.prototype.close = function(){
     clearTimeout(this.greetingTimeout);
 
     if(!this.connection){
+        if(typeof this.callback == "function" && this.error){
+            this.callback(this.error, false, this.logText);
+            this.callback = false;
+        }
         return;
     }
 
     var socket = this.connection.socket || this.connection;
     if(socket && !socket.destroyed){
+        if(typeof this.callback == "function" && this.error){
+            this.callback(this.error, false, this.logText);
+            this.callback = false;
+        }
         socket.destroy();
     }else{
         if(typeof this.callback == "function" && this.error){
@@ -254,7 +264,8 @@ IMAPChecker.prototype.processData = function(data){
         return this.nextAction();
     }
 
-    var action = this.actions[this.currentAction];
+    var action = this.actions[this.currentAction],
+        humanReadable = command.attributes && command.attributes.length && command.attributes[command.attributes.length-1].type == "TEXT" && command.attributes[command.attributes.length-1].value || false;
 
     // handle tagged response
     if(command.tag == action.tag){
@@ -268,14 +279,14 @@ IMAPChecker.prototype.processData = function(data){
                 if(typeof action.no == "function"){
                     action.no(this);
                 }else{
-                    this.onError(new Error("Unexpected NO" + (command.humanReadable ? ": " + command.humanReadable : "")));
+                    this.onError(new Error("Unexpected NO" + (humanReadable ? ": " + humanReadable : "")));
                 }
                 break;
             case "BAD":
                 if(typeof action.bad == "function"){
                     action.bad(this);
                 }else{
-                    this.onError(new Error("Unexpected BAD" + (command.humanReadable ? ": " + command.humanReadable : "")));
+                    this.onError(new Error("Unexpected BAD" + (humanReadable ? ": " + humanReadable : "")));
                 }
                 break;
             default:
