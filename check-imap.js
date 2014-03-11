@@ -42,7 +42,7 @@ function IMAPChecker(options, callback){
 
             ok: function(self){
                 // if no need to run STARTTLS, skip it and post-starttls capability
-                if(self.ssl || self.ignoreSTARTTLS || (self.capability["pre-auth"] || []).indexOf("STARTTLS") >= 0){
+                if(self.ssl || self.ignoreSTARTTLS || (self.capability["pre-auth"] || []).indexOf("STARTTLS") < 0){
                     self.currentAction += 2;
                 }
                 self.nextAction();
